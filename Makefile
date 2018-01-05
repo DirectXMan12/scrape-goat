@@ -5,7 +5,7 @@ OUT_DIR?=./_output
 
 all: build
 build: vendor
-	CGO_ENABLED=0 GOARCH=$(ARCH) go build -a -tags netgo -o $(OUT_DIR)/$(ARCH)/scrape-proxy github.com/directxman12/scrape-goat/cmd/scrape-proxy
+	CGO_ENABLED=0 GOARCH=$(ARCH) go build -a -tags netgo -o $(OUT_DIR)/$(ARCH)/scrape-goat github.com/directxman12/scrape-goat/cmd/scrape-goat
 
 vendor: glide.lock
 	glide install -v

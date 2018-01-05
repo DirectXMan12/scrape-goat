@@ -1,0 +1,37 @@
+package: github.com/directxman12/scrape-goat
+import:
+- package: github.com/prometheus/client_model
+  subpackages:
+  - go
+- package: github.com/prometheus/common
+  subpackages:
+  - model
+- package: github.com/prometheus/prometheus
+  subpackages:
+  - pkg/pool
+- package: github.com/spf13/cobra
+- package: k8s.io/apimachinery
+  subpackages:
+  - pkg/apis/meta/v1
+  - pkg/labels
+  - pkg/runtime
+  - pkg/runtime/schema
+  - pkg/util/runtime
+  - pkg/util/wait
+- package: k8s.io/apiserver
+  subpackages:
+  - pkg/util/logs
+- package: k8s.io/api
+  subpackages:
+  - core/v1
+- package: k8s.io/client-go
+  version: ^5.0.0
+  subpackages:
+  - discovery
+  - dynamic
+  - rest
+  - tools/clientcmd
+- package: github.com/onsi/ginkgo
+  version: ^1.4.0
+- package: github.com/onsi/gomega
+  version: ^1.2.0

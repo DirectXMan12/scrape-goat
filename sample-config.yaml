@@ -1,0 +1,62 @@
+defaultConfig:
+  # these apply across all rules, unless overriden by an individual rule
+  timing:
+    scrapeInterval: 1m
+    scrapeTimeout: 5s
+  limits:
+    # 10 series, split up amongst metrics however
+    maxSeries: 10
+  connection:
+    # set up where to find metrics on each pod/service/endpoint
+    path: { from: "metadata:annotations:metrics.openshift.io/path" }
+    port: { from: "metadata:annotations:metrics.openshift.io/port" }
+    scheme: { const: "http" }
+    username: { from: "metadata:annotations:metrics.openshift.io/password" }
+    password: { from: "metadata:annotations:metrics.openshift.io/username" }
+
+rules:
+- name: infra
+  conditions:
+  - on: namespace
+    when: { name: openshift-infra }
+  - from: pod
+  - from: endpoints
+  - from: service
+  scrape:
+    limits:
+      # no limit on the maximum number of series
+      maxSeries: 0
+
+- name: trusted
+  conditions:
+  - on: namespace
+    when: { annotations: { openshift.io/trust-metrics: true } }
+  - from: pod
+    when: { annotations: { openshift.io/metrics-provider: true } }
+  scrape:
+    limits:
+      # trusted metrics-providers are allowed to
+      # have an unlimited number of series, as
+      # long as there is only one metric name.
+      maxSeries: 0
+      maxFamilies: 1
+  relabel:
+  # make sure that the namespace on the metrics is always the source namespace
+  - source: { from: "metadata:namespace" }
+    target: "namespace"
+
+- name: user
+  conditions:
+  # scrape "normal" untrusted metrics
+  - from: pod
+    when: { annotations: { openshift.io/metrics-provider: true } }
+  relabel:
+  # sanitize some values
+  - source: { from: "metadata:namespace" }
+    target: "namespace"
+  - source: { from: "metadata:name" }
+    target: "name"
+  - source: { const: "user-provided" }
+    target: "metric_kind"
+  - source: { matches: ".*" }
+    target: "user_${0}"
